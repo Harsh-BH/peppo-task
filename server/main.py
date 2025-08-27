@@ -24,8 +24,6 @@ app.add_middleware(
 
 os.makedirs("videos", exist_ok=True)
 
-
-
 class VideoRequest(BaseModel):
     prompt: str
 
@@ -37,19 +35,28 @@ class VideoResponse(BaseModel):
 tasks = {}
 
 @app.post("/api/generate-video", response_model=VideoResponse)
-async def create_video(request: VideoRequest, background_tasks: BackgroundTasks):
+async def create_video(request: VideoRequest):
     task_id = str(uuid.uuid4())
     tasks[task_id] = {"status": "processing", "video_path": None}
     
-    background_tasks.add_task(
-        process_video_generation, task_id, request.prompt
-    )
+    # Directly await the function instead of using background tasks
+    await process_video_generation(task_id, request.prompt)
     
-    return VideoResponse(
-        task_id=task_id,
-        status="processing",
-        message="Video generation started"
-    )
+    # Get the updated task status after processing is complete
+    task = tasks[task_id]
+    
+    if task["status"] == "completed":
+        return VideoResponse(
+            task_id=task_id,
+            status="completed",
+            message="Video generation completed"
+        )
+    else:
+        return VideoResponse(
+            task_id=task_id,
+            status="failed",
+            message=task.get("error", "Unknown error")
+        )
 
 async def process_video_generation(task_id: str, prompt: str):
     error_messages = []

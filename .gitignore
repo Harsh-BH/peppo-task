@@ -5,3 +5,4 @@ __pycache__/
 server/__pycache__/
 client/.next/
 server/.env
+server/videos/

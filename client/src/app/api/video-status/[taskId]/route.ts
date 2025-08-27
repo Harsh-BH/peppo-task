@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const API_BASE_URL = "http://localhost:8000/api";
+const API_BASE_URL = "http://13.233.238.90/docs";
 
 // ✅ Correct function signature for Next.js 15
 export async function GET(

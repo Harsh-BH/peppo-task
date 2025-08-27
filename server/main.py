@@ -3,8 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 import os
 from pydantic import BaseModel
+# Import all video generation methods
 from utils.video_service import generate_video
 from utils.runway_service import generate_video_runway
+from utils.stability_service import generate_video_stability
 from utils.video_service_local import generate_video_local
 from utils.dummy_service import generate_dummy_video
 import uvicorn
@@ -67,25 +69,33 @@ async def process_video_generation(task_id: str, prompt: str):
             except Exception as runway_error:
                 error_messages.append(f"Runway video generation failed: {runway_error}")
                 print(error_messages[-1])
-                print("Falling back to local video generation method...")
+                print("Falling back to Stability AI method...")
                 
                 try:
-                    video_path = await generate_video_local(prompt)
+                    video_path = await generate_video_stability(prompt)
                     tasks[task_id] = {"status": "completed", "video_path": video_path}
-                except Exception as local_error:
-                    error_messages.append(f"Local video generation failed: {local_error}")
+                except Exception as stability_error:
+                    error_messages.append(f"Stability AI video generation failed: {stability_error}")
                     print(error_messages[-1])
-                    print("All generation methods failed. Creating dummy video...")
+                    print("Falling back to local video generation method...")
                     
-                    # Final fallback - always provide some video response
-                    combined_errors = "\n".join(error_messages)
-                    video_path = await generate_dummy_video(prompt, f"All generation methods failed")
-                    tasks[task_id] = {
-                        "status": "completed", 
-                        "video_path": video_path,
-                        "is_fallback": True,
-                        "error_details": combined_errors
-                    }
+                    try:
+                        video_path = await generate_video_local(prompt)
+                        tasks[task_id] = {"status": "completed", "video_path": video_path}
+                    except Exception as local_error:
+                        error_messages.append(f"Local video generation failed: {local_error}")
+                        print(error_messages[-1])
+                        print("All generation methods failed. Creating dummy video...")
+                        
+                        # Final fallback - always provide some video response
+                        combined_errors = "\n".join(error_messages)
+                        video_path = await generate_dummy_video(prompt, f"All generation methods failed")
+                        tasks[task_id] = {
+                            "status": "completed", 
+                            "video_path": video_path,
+                            "is_fallback": True,
+                            "error_details": combined_errors
+                        }
     except Exception as e:
         tasks[task_id] = {"status": "failed", "error": str(e)}
 

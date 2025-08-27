@@ -4,7 +4,6 @@ import uuid
 import torch
 from diffusers import DiffusionPipeline
 
-# Initialize the model lazily to avoid loading it on import
 pipe = None
 
 def get_pipeline():
@@ -27,11 +26,9 @@ async def generate_video_local(prompt: str) -> str:
         
         print(f"Generating video locally with prompt: {prompt}")
         
-        # Run the model in a separate thread to not block the event loop
         def run_inference():
             model = get_pipeline()
             output = model(prompt)
-            # Save the first video from the output
             output.videos[0].save(video_path)
         
         await asyncio.to_thread(run_inference)

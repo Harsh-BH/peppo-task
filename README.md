@@ -28,11 +28,30 @@ peppo-task/
 │   ├── utils/        # Utility modules
 │   ├── videos/       # Generated videos storage
 │   └── main.py       # Server entry point
-└── client/           # Next.js frontend
-    ├── components/   # React components
-    ├── pages/        # Next.js pages
-    ├── public/       # Static assets
-    └── styles/       # CSS styles
+|----client/
+    ├── public/                # Static assets (images, favicon, etc.)
+    ├── src/
+    │   ├── app/               # App Router entry point (routes live here)
+    │   │   ├── api/           # API routes for Next.js
+    │   │   │   ├── generate-video/
+    │   │   │   │   └── route.ts
+    │   │   │   ├── video-status/
+    │   │   │   │   └── [taskId]/route.ts
+    │   │   │   └── videos/
+    │   │   │       └── [taskId]/route.ts
+    │   │   ├── layout.tsx     # Root layout
+    │   │   └── page.tsx       # Main page
+    │   │
+    │   ├── components/        # Reusable UI components
+    │   ├── lib/               # Utility functions (API helpers, constants)
+    │   ├── styles/            # Global CSS / Tailwind styles
+    │   └── services/          # API service layer
+    │
+    ├── next.config.ts
+    ├── package.json
+    ├── tsconfig.json
+    
+
 ```
 
 ---

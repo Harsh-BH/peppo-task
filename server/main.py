@@ -40,7 +40,9 @@ async def create_video(request: VideoRequest):
     tasks[task_id] = {"status": "processing", "video_path": None}
     
     # Directly await the function instead of using background tasks
+    print(f"Starting video generation for task {task_id} with prompt: {request.prompt}")
     await process_video_generation(task_id, request.prompt)
+    print(f"Video generation process for task {task_id} has completed.")
     
     # Get the updated task status after processing is complete
     task = tasks[task_id]
@@ -63,7 +65,7 @@ async def process_video_generation(task_id: str, prompt: str):
     try:
         try:
             # Try the primary method first (huggingface_hub)
-            video_path = await generate_video(prompt)
+            video_path = await generate_video(prompt, task_id)
             tasks[task_id] = {"status": "completed", "video_path": video_path}
         except Exception as e:
             error_messages.append(f"Primary video generation failed: {e}")
@@ -71,7 +73,7 @@ async def process_video_generation(task_id: str, prompt: str):
             print("Falling back to Runway API method...")
             
             try:
-                video_path = await generate_video_runway(prompt)
+                video_path = await generate_video_runway(prompt, task_id)
                 tasks[task_id] = {"status": "completed", "video_path": video_path}
             except Exception as runway_error:
                 error_messages.append(f"Runway video generation failed: {runway_error}")
@@ -79,7 +81,7 @@ async def process_video_generation(task_id: str, prompt: str):
                 print("Falling back to Stability AI method...")
                 
                 try:
-                    video_path = await generate_video_stability(prompt)
+                    video_path = await generate_video_stability(prompt, task_id)
                     tasks[task_id] = {"status": "completed", "video_path": video_path}
                 except Exception as stability_error:
                     error_messages.append(f"Stability AI video generation failed: {stability_error}")
@@ -87,7 +89,7 @@ async def process_video_generation(task_id: str, prompt: str):
                     print("Falling back to local video generation method...")
                     
                     try:
-                        video_path = await generate_video_local(prompt)
+                        video_path = await generate_video_local(prompt, task_id)
                         tasks[task_id] = {"status": "completed", "video_path": video_path}
                     except Exception as local_error:
                         error_messages.append(f"Local video generation failed: {local_error}")
@@ -96,7 +98,7 @@ async def process_video_generation(task_id: str, prompt: str):
                         
                         # Final fallback - always provide some video response
                         combined_errors = "\n".join(error_messages)
-                        video_path = await generate_dummy_video(prompt, f"All generation methods failed")
+                        video_path = await generate_dummy_video(prompt, f"All generation methods failed", task_id)
                         tasks[task_id] = {
                             "status": "completed", 
                             "video_path": video_path,

@@ -4,7 +4,7 @@ import uuid
 from huggingface_hub import InferenceClient
 from config import HF_TOKEN
 
-async def generate_video(prompt: str) -> str:
+async def generate_video(prompt: str, task_id: str) -> str:
     try:
         os.makedirs("videos", exist_ok=True)
         
@@ -13,8 +13,7 @@ async def generate_video(prompt: str) -> str:
             api_key=HF_TOKEN,
         )
         
-        video_id = str(uuid.uuid4())
-        video_path = os.path.join("videos", f"{video_id}.mp4")
+        video_path = os.path.join("videos", f"{task_id}.mp4")
         
         print(f"Generating video with prompt: {prompt}")
         video = await asyncio.to_thread(

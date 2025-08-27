@@ -4,6 +4,6 @@ python-dotenv==1.0.0
 huggingface_hub==0.19.4
 pydantic==2.3.0
 python-multipart==0.0.6
-diffusers==0.23.1
-torch==2.1.0
+diffusers
+torch
 requests==2.31.0

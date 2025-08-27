@@ -1,9 +1,9 @@
-fastapi==0.103.1
-uvicorn==0.23.2
-python-dotenv==1.0.0
-huggingface_hub==0.19.4
-pydantic==2.3.0
-python-multipart==0.0.6
+fastapi
+uvicorn
+python-dotenv
+huggingface_hub
+pydantic
+python-multipart
 diffusers
 torch
-requests==2.31.0
+requests

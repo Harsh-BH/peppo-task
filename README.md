@@ -209,10 +209,9 @@ npm start
 
 ## Frontend Features
 
-* Clean, responsive UI with React and Next.js
+* Clean, responsive UI with Next.js
 * Real-time status updates
 * Video preview with playback controls
-* History of generated videos
 * Form validation and error handling
 * Mobile-friendly design
 
@@ -253,7 +252,6 @@ All generation happens asynchronously, allowing quick API responses while client
 ### Frontend
 
 * Next.js
-* React
 * Tailwind CSS
 * Axios
 * React Query

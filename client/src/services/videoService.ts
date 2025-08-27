@@ -41,5 +41,5 @@ export const getVideoStatus = async (taskId: string): Promise<VideoStatus> => {
 };
 
 export const getVideoUrl = (taskId: string): string => {
-  return `/api/videos/${taskId}`;
+  return `/api/videos/${taskId}.mp4`;
 };

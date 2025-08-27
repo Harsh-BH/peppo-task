@@ -1,13 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 const API_BASE_URL = 'http://localhost:8000/api';
 
 export async function GET(
-  request: Request,
-  { params }: { params: { taskId: string } }
+    request: NextRequest,
+    context: { params: Promise<{ taskId: string }> }
+  
 ) {
   try {
-    const taskId = params.taskId;
+    const { taskId } = await context.params;
     
     const response = await fetch(`${API_BASE_URL}/videos/${taskId}`);
 

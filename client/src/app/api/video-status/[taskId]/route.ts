@@ -1,14 +1,16 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = "http://localhost:8000/api";
 
+// ✅ Correct function signature for Next.js 15
 export async function GET(
-  request: Request,
-  { params }: { params: { taskId: string } }
+  request: NextRequest,
+  context: { params: Promise<{ taskId: string }> }
 ) {
   try {
-    const taskId = params.taskId;
-    
+    // ✅ Await the params Promise
+    const { taskId } = await context.params;
+
     const response = await fetch(`${API_BASE_URL}/video-status/${taskId}`);
 
     if (!response.ok) {
@@ -18,9 +20,9 @@ export async function GET(
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Error checking video status:', error);
+    console.error("Error checking video status:", error);
     return NextResponse.json(
-      { error: 'Failed to check video status' },
+      { error: "Failed to check video status" },
       { status: 500 }
     );
   }

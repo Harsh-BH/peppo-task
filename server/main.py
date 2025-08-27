@@ -3,8 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 import os
 from pydantic import BaseModel
-# Import both video generation methods
+# Import all video generation methods
 from utils.video_service import generate_video
+from utils.runway_service import generate_video_runway
 from utils.video_service_local import generate_video_local
 import uvicorn
 import uuid
@@ -55,11 +56,18 @@ async def process_video_generation(task_id: str, prompt: str):
             video_path = await generate_video(prompt)
             tasks[task_id] = {"status": "completed", "video_path": video_path}
         except Exception as e:
-            # If primary method fails, try the local fallback method (diffusers)
+            # If primary method fails, try the Runway API
             print(f"Primary video generation failed: {e}")
-            print("Falling back to local video generation method...")
-            video_path = await generate_video_local(prompt)
-            tasks[task_id] = {"status": "completed", "video_path": video_path}
+            print("Falling back to Runway API method...")
+            try:
+                video_path = await generate_video_runway(prompt)
+                tasks[task_id] = {"status": "completed", "video_path": video_path}
+            except Exception as runway_error:
+                # If Runway also fails, try the local fallback method
+                print(f"Runway video generation failed: {runway_error}")
+                print("Falling back to local video generation method...")
+                video_path = await generate_video_local(prompt)
+                tasks[task_id] = {"status": "completed", "video_path": video_path}
     except Exception as e:
         tasks[task_id] = {"status": "failed", "error": str(e)}
 
